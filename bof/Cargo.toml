@@ -1,0 +1,12 @@
+[package]
+name = "bof"
+version = "0.1.0"
+authors = ["Deathlesz"]
+edition = "2021"
+description = "A library for creating/viewing/extracting BOF archives."
+license = "MIT OR Apache-2.0"
+publish = false
+
+[dependencies]
+crc32fast = "1.4"
+thiserror = "1.0"

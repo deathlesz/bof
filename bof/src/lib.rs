@@ -131,6 +131,35 @@ impl BofArchive {
 
         Ok(archive)
     }
+
+    pub unsafe fn parse_unchecked(bytes: &[u8]) -> Self {
+        // skipping reserved byte at offset 5
+        let mut offset = 6;
+        let mut archive = BofArchive::new();
+
+        while bytes[offset..].len() > 4 {
+            // collect all bytes in a string until we meet 0x0 byte
+            let file_name = bytes[offset..bytes.len() - 3]
+                .iter()
+                .take_while(|byte| **byte != 0x0)
+                .map(|byte| *byte as char)
+                .collect::<String>();
+
+            let file_size_offset = offset + file_name.len() + 1;
+            let file_size_bytes = bytes.get(file_size_offset..file_size_offset + 8).unwrap();
+            let file_size = u64::from_le_bytes(file_size_bytes.try_into().unwrap());
+
+            let file_contents_offset = file_size_offset + 8;
+            let file_contents = bytes
+                .get(file_contents_offset..(file_contents_offset + file_size as usize))
+                .unwrap();
+
+            offset = file_contents_offset + file_size as usize + 4;
+            archive.add(file_name, file_contents.to_vec());
+        }
+
+        archive
+    }
 }
 
 impl<'a> TryFrom<&'a [u8]> for BofArchive {

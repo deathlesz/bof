@@ -1,5 +1,5 @@
 #[derive(Debug, Clone, PartialEq, Hash, thiserror::Error)]
-pub enum BofError {
+pub enum Error {
     #[error("invalid archive: {0}")]
     InvalidArchive(String),
     #[error("archive version is too high: {expected} < {version}")]
